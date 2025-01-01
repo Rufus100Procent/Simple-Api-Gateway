@@ -1,13 +1,16 @@
-package se.wacoco.nowleapigateway.config;
+package se.stykle.simple.gateway.config.security;
 
 
-import se.wacoco.nowleapigateway.CustomLogoutSuccessHandler;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+//import se.wacoco.nowleapigateway.CustomLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+//import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -19,24 +22,33 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    private String jwkSetUri;
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/public/**").permitAll()
+                        .pathMatchers("/public/**", "/exchange-token", "/test/").permitAll()
                         .anyExchange().authenticated())
                 .oauth2Login(withDefaults())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(logoutSuccessHandler()))
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtDecoder(jwtDecoder())))
                 .build();
     }
+
     @Bean
-    public ServerLogoutSuccessHandler logoutSuccessHandler() {
-        return new CustomLogoutSuccessHandler();
+    public ReactiveJwtDecoder jwtDecoder() {
+        return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
+
+//    @Bean
+//    public ServerLogoutSuccessHandler logoutSuccessHandler() {
+//        return new CustomLogoutSuccessHandler();
+//    }
+
     @Bean
     public CorsWebFilter corsWebFilter() {
         return new CorsWebFilter(corsConfigurationSource());
@@ -47,8 +59,9 @@ public class SecurityConfig {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "http://localhost:8431",
-                "https://DOMAIN-app-test.web.app"
+                "http://localhost:5177",
+                "https://PROD-DOMAIN-app.com",
+                "https://DEV-DOMAIN-app.com"
         ));
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfig.setAllowedHeaders(List.of("*"));

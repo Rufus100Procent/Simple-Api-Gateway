@@ -1,4 +1,4 @@
-package se.wacoco.nowleapigateway;
+package se.stykle.simple.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

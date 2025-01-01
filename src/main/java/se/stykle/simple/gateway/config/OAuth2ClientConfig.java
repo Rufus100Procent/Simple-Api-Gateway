@@ -1,4 +1,4 @@
-package se.wacoco.nowleapigateway.config;
+package se.stykle.simple.gateway.config;
 
 
 import org.springframework.context.annotation.Bean;

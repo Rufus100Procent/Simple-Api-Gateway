@@ -1,10 +1,8 @@
-package se.wacoco.nowleapigateway;
+package se.stykle.simple.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @RestController
 @SpringBootApplication
@@ -14,8 +12,4 @@ public class Main {
 		SpringApplication.run(Main.class, args);
 	}
 
-	@GetMapping("/")
-	public Mono<String> index() {
-		return Mono.just("Hello World");
-	}
 }
