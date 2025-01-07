@@ -31,7 +31,8 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/public/**", "/exchange-token", "/test/").permitAll()
+                        .pathMatchers("/public/**", "/api/v0/exchange-token", "/test",
+                                "/api/v0/dev/logout", "/api/v0/prod/logout").permitAll()
                         .anyExchange().authenticated())
                 .oauth2Login(withDefaults())
                 .oauth2ResourceServer(oauth2 -> oauth2
